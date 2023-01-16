@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <mpi.h>
+
+int main(int argc,char *argv[]){
+	
+	int numprocs,myid,source,i;
+	double value[5]={1.1, 2.1, 3.1, 4.1, 5.1};
+	MPI_Status status;
+	 MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+	if(myid!=0) { //判断是否是主节点
+    MPI_Send(value,5,MPI_DOUBLE,0,1,MPI_COMM_WORLD);//子节点向主节点传送结果
+  }
+  else {
+    /*分别接收来自于不同子节点的数据*/
+    for(source=1;source<numprocs;source++) {
+      MPI_Recv(value,5,MPI_DOUBLE,source,1,MPI_COMM_WORLD,&status);
+     
+    }
+	for(i=0;i<5;i++){
+		printf(" %f ",value[i]);
+	printf("\n");
+  }
+  }
+   MPI_Finalize();
+   return 0;
+   }
